@@ -1,9 +1,14 @@
 package io.devbits.gitbit.home
 
 import android.os.Bundle
+import android.os.IBinder
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.lifecycle.Observer
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
@@ -44,12 +49,7 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
             }
         })
 
-        search_button.setOnClickListener {
-            val username = username_edit_text.text.toString()
-            if (username.isNotBlank()) {
-                viewModel.setUserName(username)
-            }
-        }
+        initSearchInputListener()
 
         viewModel.usernameLiveData.observe(this, Observer {
             username_edit_text.setText(it)
@@ -57,6 +57,36 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
 
     }
 
+    private fun initSearchInputListener() {
+        username_edit_text.setOnEditorActionListener { view: View, actionId: Int, _: KeyEvent? ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                doSearch(view)
+                true
+            } else {
+                false
+            }
+        }
+        username_edit_text.setOnKeyListener { view: View, keyCode: Int, event: KeyEvent ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                doSearch(view)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun doSearch(v: View) {
+        val username = username_edit_text.text.toString()
+        // Dismiss keyboard
+        dismissKeyboard(v.windowToken)
+        viewModel.setUserName(username)
+    }
+
+    private fun dismissKeyboard(windowToken: IBinder) {
+        val imm = getSystemService<InputMethodManager>()
+        imm?.hideSoftInputFromWindow(windowToken, 0)
+    }
 }
 
 fun View.show() {

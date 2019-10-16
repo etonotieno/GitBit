@@ -20,7 +20,6 @@ class MainViewModel(
             }
         }
 
-
     fun setUserName(username: String) {
         if (usernameLiveData.value != username) {
             _usernameLiveData.value = username

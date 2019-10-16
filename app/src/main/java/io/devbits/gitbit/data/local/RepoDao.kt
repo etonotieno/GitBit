@@ -13,7 +13,7 @@ interface RepoDao {
     suspend fun insertRepo(repo: Repo)
 
     @Insert
-    suspend fun insertRepos(vararg repo: Repo)
+    suspend fun insertRepos(repos: List<Repo>)
 
     @Query("SELECT * FROM Repo")
     fun getGithubRepos(): LiveData<List<Repo>>

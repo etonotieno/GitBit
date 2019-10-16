@@ -5,7 +5,9 @@ import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.api.GithubApiResponse
 import io.devbits.gitbit.data.api.GithubApiService
 
-class GithubRepository(private val apiService: GithubApiService) {
+class GithubRepository(
+    private val apiService: GithubApiService
+) {
 
     suspend fun getGithubRepos(username: String): Result<List<Repo>> {
         return try {
