@@ -26,6 +26,3 @@ class GithubRepoViewHolder private constructor(
         }
     }
 }
-
-val RecyclerView.ViewHolder.context
-    get() = itemView.context

@@ -13,12 +13,14 @@ import androidx.lifecycle.Observer
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
 import io.devbits.gitbit.data.Result
-import io.devbits.gitbit.data.remote.GithubApiServiceCreator
 import io.devbits.gitbit.data.local.GithubRepoDatabase
+import io.devbits.gitbit.data.remote.GithubApiServiceCreator
 import io.devbits.gitbit.domain.GithubRepository
-import kotlinx.android.synthetic.main.main_activity.*
+import io.devbits.gitbit.util.hide
+import io.devbits.gitbit.util.show
+import kotlinx.android.synthetic.main.activity_home.*
 
-class MainActivity : AppCompatActivity(R.layout.main_activity) {
+class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     private val reposAdapter = GithubRepoAdapter()
     private val repoDao by lazy {
@@ -27,7 +29,7 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
     }
     private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient() }
     private val repository by lazy { GithubRepository(apiService, repoDao) }
-    private val viewModel: MainViewModel by viewModels { GitBitViewModelFactory(repository) }
+    private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
 
         initSearchInputListener()
 
-        viewModel.username.observe(this, Observer {
+        viewModel.usernameLiveData.observe(this, Observer {
             username_edit_text.setText(it)
         })
 
@@ -96,12 +98,4 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
         val imm = getSystemService<InputMethodManager>()
         imm?.hideSoftInputFromWindow(windowToken, 0)
     }
-}
-
-fun View.show() {
-    visibility = View.VISIBLE
-}
-
-fun View.hide() {
-    visibility = View.GONE
 }
