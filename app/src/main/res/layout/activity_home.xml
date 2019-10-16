@@ -5,39 +5,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/topGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="@dimen/spacing_normal" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottomGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="@dimen/spacing_normal" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/startGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/spacing_normal" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/endGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/spacing_normal" />
+
     <EditText
         android:id="@+id/username_edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_normal"
-        android:layout_marginTop="@dimen/spacing_small"
-        android:layout_marginEnd="@dimen/spacing_normal"
         android:hint="@string/username_hint"
         android:imeOptions="actionSearch"
         android:inputType="textNoSuggestions"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/endGuideline"
+        app:layout_constraintStart_toStartOf="@+id/startGuideline"
+        app:layout_constraintTop_toTopOf="@+id/topGuideline" />
 
     <TextView
         android:id="@+id/empty_state_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/no_repos_found"
         android:textAppearance="?attr/textAppearanceHeadline5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/endGuideline"
+        app:layout_constraintStart_toStartOf="@+id/startGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/username_edit_text" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/repos_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/spacing_normal"
+        android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/endGuideline"
+        app:layout_constraintStart_toStartOf="@+id/startGuideline"
         app:layout_constraintTop_toBottomOf="@id/username_edit_text"
         tools:listitem="@layout/row_repo_layout" />
 
@@ -45,9 +72,10 @@
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottomGuideline"
+        app:layout_constraintEnd_toStartOf="@+id/endGuideline"
+        app:layout_constraintStart_toStartOf="@+id/startGuideline"
+        app:layout_constraintTop_toBottomOf="@+id/username_edit_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

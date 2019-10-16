@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Git Bit</string>
-    <string name="error_fetching_repos">Error fetching repositories for %1s</string>
+    <string name="error_fetching_repos">Error fetching repositories. Check your username</string>
+    <string name="unexpected_error">An unexpected error was encountered</string>
     <string name="no_repos_found">No repositories were found</string>
     <string name="username_hint">Username</string>
 </resources>

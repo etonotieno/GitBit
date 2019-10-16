@@ -36,34 +36,39 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
         repos_recycler_view.adapter = reposAdapter
 
-        viewModel.githubRepos.observe(this, Observer { result ->
-            when (result) {
-                is Result.Success -> {
-                    reposAdapter.submitList(result.data)
-                    empty_state_text_view.hide()
-                    progress_bar.hide()
-                    repos_recycler_view.show()
-                    if (result.data.isEmpty()) {
-                        progress_bar.hide()
-                        repos_recycler_view.hide()
-                        empty_state_text_view.show()
-                    }
-                }
-                is Result.Error -> {
-                    //TODO: Show Snackbar with the error message or an error state layout
-                }
-                Result.Loading -> {
-                    repos_recycler_view.hide()
-                    empty_state_text_view.hide()
-                    progress_bar.show()
-                }
-            }
-        })
-
         initSearchInputListener()
 
         viewModel.usernameLiveData.observe(this, Observer {
             username_edit_text.setText(it)
+        })
+
+        viewModel.githubRepos.observe(this, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    if (result.data.isNullOrEmpty()) {
+                        repos_recycler_view.hide()
+                        progress_bar.hide()
+                        empty_state_text_view.show()
+                        empty_state_text_view.text = getString(R.string.no_repos_found)
+                        return@Observer
+                    }
+                    repos_recycler_view.show()
+                    progress_bar.hide()
+                    empty_state_text_view.hide()
+                    reposAdapter.submitList(result.data)
+                }
+                is Result.Error -> {
+                    repos_recycler_view.hide()
+                    progress_bar.hide()
+                    empty_state_text_view.show()
+                    empty_state_text_view.text = getString(R.string.error_fetching_repos)
+                }
+                Result.Loading -> {
+                    repos_recycler_view.hide()
+                    progress_bar.show()
+                    empty_state_text_view.hide()
+                }
+            }
         })
 
     }
