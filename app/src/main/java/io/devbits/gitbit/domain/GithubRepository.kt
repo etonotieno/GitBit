@@ -11,14 +11,19 @@ class GithubRepository(private val apiService: GithubApiService) {
         return try {
             Result.Loading
 
-            val apiResponse = apiService.getRepositories(username)
+            val githubRepos = getReposRemote(username)
 
-            val githubRepos = apiResponse.map { it.mapToRepo() }
             Result.Success(githubRepos)
         } catch (e: Exception) {
             Result.Error(e)
         }
     }
+
+    private suspend fun getReposRemote(username: String): List<Repo> {
+        val apiResponse = apiService.getRepositories(username)
+        return apiResponse.map { it.mapToRepo() }
+    }
+
 }
 
 fun GithubApiResponse.mapToRepo(): Repo {

@@ -1,4 +1,4 @@
-package io.devbits.gitbit
+package io.devbits.gitbit.home
 
 import androidx.lifecycle.*
 import io.devbits.gitbit.data.Repo
@@ -9,19 +9,20 @@ class MainViewModel(
     private val repository: GithubRepository
 ) : ViewModel() {
 
-    private val _usernameLiveData = MutableLiveData<String>().apply { value = "etonotieno" }
+    private val _usernameLiveData = MutableLiveData<String>()
     val usernameLiveData: LiveData<String>
         get() = _usernameLiveData
 
     val githubReposLiveData: LiveData<Result<List<Repo>>> =
-        usernameLiveData.switchMap { username ->
+        _usernameLiveData.switchMap { username ->
             liveData {
                 emit(repository.getGithubRepos(username))
             }
         }
 
+
     fun setUserName(username: String) {
-        if (_usernameLiveData.value != username) {
+        if (usernameLiveData.value != username) {
             _usernameLiveData.value = username
         }
     }

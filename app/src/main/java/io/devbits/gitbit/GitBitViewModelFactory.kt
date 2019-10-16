@@ -1,10 +1,10 @@
-package io.devbits.gitbit.home
+package io.devbits.gitbit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.devbits.gitbit.MainViewModel
 import io.devbits.gitbit.data.api.GithubApiServiceCreator
 import io.devbits.gitbit.domain.GithubRepository
+import io.devbits.gitbit.home.MainViewModel
 
 @Suppress("UNCHECKED_CAST")
 class GitBitViewModelFactory(
