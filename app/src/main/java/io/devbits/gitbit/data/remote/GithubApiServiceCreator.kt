@@ -1,4 +1,4 @@
-package io.devbits.gitbit.data.api
+package io.devbits.gitbit.data.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

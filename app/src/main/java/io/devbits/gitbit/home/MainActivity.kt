@@ -13,19 +13,28 @@ import androidx.lifecycle.Observer
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
 import io.devbits.gitbit.data.Result
+import io.devbits.gitbit.data.remote.GithubApiServiceCreator
+import io.devbits.gitbit.data.local.GithubRepoDatabase
+import io.devbits.gitbit.domain.GithubRepository
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity(R.layout.main_activity) {
 
     private val reposAdapter = GithubRepoAdapter()
-    private val viewModel: MainViewModel by viewModels { GitBitViewModelFactory() }
+    private val repoDao by lazy {
+        val database = GithubRepoDatabase(this)
+        database.reoDao()
+    }
+    private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient() }
+    private val repository by lazy { GithubRepository(apiService, repoDao) }
+    private val viewModel: MainViewModel by viewModels { GitBitViewModelFactory(repository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         repos_recycler_view.adapter = reposAdapter
 
-        viewModel.githubReposLiveData.observe(this, Observer { result ->
+        viewModel.githubRepos.observe(this, Observer { result ->
             when (result) {
                 is Result.Success -> {
                     reposAdapter.submitList(result.data)
@@ -51,7 +60,7 @@ class MainActivity : AppCompatActivity(R.layout.main_activity) {
 
         initSearchInputListener()
 
-        viewModel.usernameLiveData.observe(this, Observer {
+        viewModel.username.observe(this, Observer {
             username_edit_text.setText(it)
         })
 

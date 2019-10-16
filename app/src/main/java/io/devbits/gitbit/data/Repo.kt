@@ -9,5 +9,6 @@ data class Repo(
     @PrimaryKey
     val id: Int,
     val stars: Int,
-    val description: String
+    val description: String,
+    val ownerUsername: String
 )

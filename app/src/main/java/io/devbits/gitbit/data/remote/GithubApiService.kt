@@ -1,4 +1,4 @@
-package io.devbits.gitbit.data.api
+package io.devbits.gitbit.data.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path
