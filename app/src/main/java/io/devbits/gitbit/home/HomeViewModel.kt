@@ -7,10 +7,11 @@ import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.domain.GithubRepository
 
 class HomeViewModel(
-    private val repository: GithubRepository
+    private val repository: GithubRepository,
+    private val state: SavedStateHandle
 ) : ViewModel() {
 
-    private val _username = MutableLiveData<String>()
+    private val _username = state.getLiveData<String>(USERNAME_KEY)
     val usernameLiveData: LiveData<String>
         get() = _username
 
@@ -27,13 +28,17 @@ class HomeViewModel(
         }
     }
 
+    // TODO: Use a Result wrapper to show LOADING, ERROR and SUCCESS states
     val githubUsers = repository.getGithubUsers()
 
     fun setUserName(username: String) {
         if (_username.value != username) {
-            _username.value = username
+            state[USERNAME_KEY] = username
         }
     }
 
+    companion object {
+        const val USERNAME_KEY = "io.devbits:GITHUB_USERNAME"
+    }
 
 }

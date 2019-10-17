@@ -31,7 +31,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
     private val userDao by lazy { database.userDao() }
     private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient() }
     private val repository by lazy { GithubRepository(apiService, repoDao, userDao) }
-    private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository) }
+    private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository, this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
