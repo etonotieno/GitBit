@@ -1,10 +1,9 @@
-package io.devbits.gitbit.home
+package io.devbits.gitbit.home.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.devbits.gitbit.data.Repo
-import io.devbits.gitbit.home.viewholder.GithubRepoViewHolder
 
 class GithubRepoAdapter : ListAdapter<Repo, GithubRepoViewHolder>(REPO_DIFF) {
 

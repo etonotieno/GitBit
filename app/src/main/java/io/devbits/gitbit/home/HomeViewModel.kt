@@ -27,10 +27,13 @@ class HomeViewModel(
         }
     }
 
+    val githubUsers = repository.getGithubUsers()
+
     fun setUserName(username: String) {
         if (_username.value != username) {
             _username.value = username
         }
     }
+
 
 }

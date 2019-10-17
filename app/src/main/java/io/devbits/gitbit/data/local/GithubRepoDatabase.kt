@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import io.devbits.gitbit.data.User
 import io.devbits.gitbit.data.Repo
 
-@Database(entities = [Repo::class], version = 1, exportSchema = false)
+@Database(entities = [Repo::class, User::class], version = 1, exportSchema = false)
 abstract class GithubRepoDatabase : RoomDatabase() {
 
-    abstract fun reoDao(): RepoDao
+    abstract fun repoDao(): RepoDao
+    abstract fun userDao(): GithubUserDao
 
     companion object {
         @Volatile

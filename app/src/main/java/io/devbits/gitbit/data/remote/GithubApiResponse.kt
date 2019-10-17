@@ -15,3 +15,20 @@ data class Owner(
     @field:SerializedName("login") val username: String,
     @field:SerializedName("avatar_url") val avatarUrl: String
 )
+
+data class GithubUser(
+    @field:SerializedName("login")
+    val login: String,
+    @field:SerializedName("public_repos")
+    val publicRepos: Int,
+    @field:SerializedName("avatar_url")
+    val avatarUrl: String?,
+    @field:SerializedName("name")
+    val name: String?,
+    @field:SerializedName("company")
+    val company: String?,
+    @field:SerializedName("repos_url")
+    val reposUrl: String?,
+    @field:SerializedName("blog")
+    val blog: String?
+)

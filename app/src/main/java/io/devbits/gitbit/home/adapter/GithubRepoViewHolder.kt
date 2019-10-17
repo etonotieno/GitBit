@@ -1,4 +1,4 @@
-package io.devbits.gitbit.home.viewholder
+package io.devbits.gitbit.home.adapter
 
 import android.view.LayoutInflater
 import android.view.View

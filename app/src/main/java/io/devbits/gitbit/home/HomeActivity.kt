@@ -10,12 +10,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
 import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.local.GithubRepoDatabase
 import io.devbits.gitbit.data.remote.GithubApiServiceCreator
 import io.devbits.gitbit.domain.GithubRepository
+import io.devbits.gitbit.home.adapter.GithubRepoAdapter
+import io.devbits.gitbit.home.adapter.GithubUserAdapter
 import io.devbits.gitbit.util.hide
 import io.devbits.gitbit.util.show
 import kotlinx.android.synthetic.main.activity_home.*
@@ -23,18 +26,19 @@ import kotlinx.android.synthetic.main.activity_home.*
 class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     private val reposAdapter = GithubRepoAdapter()
-    private val repoDao by lazy {
-        val database = GithubRepoDatabase(this)
-        database.reoDao()
-    }
+    private val usersAdapter = GithubUserAdapter()
+    private val database by lazy { GithubRepoDatabase(this) }
+    private val repoDao by lazy { database.repoDao() }
+    private val userDao by lazy { database.userDao() }
     private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient() }
-    private val repository by lazy { GithubRepository(apiService, repoDao) }
+    private val repository by lazy { GithubRepository(apiService, repoDao, userDao) }
     private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         repos_recycler_view.adapter = reposAdapter
+        saved_users_recycler_view.adapter = usersAdapter
 
         initSearchInputListener()
 
@@ -42,7 +46,11 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
             username_edit_text.setText(it)
         })
 
-        viewModel.githubRepos.observe(this, Observer { result ->
+        viewModel.githubUsers.observe(this) { users ->
+            usersAdapter.submitList(users)
+        }
+
+        viewModel.githubRepos.observe(this) { result ->
             when (result) {
                 is Result.Success -> {
                     if (result.data.isNullOrEmpty()) {
@@ -50,7 +58,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
                         progress_bar.hide()
                         empty_state_text_view.show()
                         empty_state_text_view.text = getString(R.string.no_repos_found)
-                        return@Observer
+                        return@observe
                     }
                     repos_recycler_view.show()
                     progress_bar.hide()
@@ -69,7 +77,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
                     empty_state_text_view.hide()
                 }
             }
-        })
+        }
 
     }
 

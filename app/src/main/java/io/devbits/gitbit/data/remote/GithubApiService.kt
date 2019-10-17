@@ -10,4 +10,9 @@ interface GithubApiService {
         @Path("login") username: String
     ): List<GithubApiResponse>
 
+    @GET("users/{login}")
+    suspend fun getGithubUser(
+        @Path("login") username: String
+    ): GithubUser
+
 }

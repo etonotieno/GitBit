@@ -19,4 +19,7 @@ interface RepoDao {
     @Query("SELECT COUNT(id) FROM Repo WHERE ownerUsername =:username")
     suspend fun rows(username: String): Int
 
+    @Query("SELECT ownerUsername FROM Repo WHERE ownerUsername =:username")
+    fun getUsers(username: String): LiveData<List<String>>
+
 }
