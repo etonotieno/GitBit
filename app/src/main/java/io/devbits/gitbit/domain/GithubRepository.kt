@@ -17,6 +17,7 @@ class GithubRepository(
     suspend fun getRepos(username: String): LiveData<List<Repo>> {
         if (repoDao.rows(username) == 0) {
             fetchAndSaveRepos(username)
+            fetchAndSaveUser(username)
         }
         return repoDao.getGithubRepos(username)
     }
@@ -25,12 +26,11 @@ class GithubRepository(
         val apiResponse = apiService.getRepositories(username)
         val repos = apiResponse.map { it.mapToRepo() }
         repoDao.insertRepos(repos)
-        fetchAndSaveUser(username)
     }
 
     private suspend fun fetchAndSaveUser(username: String) {
         val apiResponse = apiService.getGithubUser(username)
-        val user = User(apiResponse.login, apiResponse.publicRepos)
+        val user = User(apiResponse.login, apiResponse.publicRepos, apiResponse.avatarUrl)
         usersDao.insertUser(user)
     }
 

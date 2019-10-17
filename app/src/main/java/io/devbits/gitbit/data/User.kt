@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class User(
     @PrimaryKey
     val username: String,
-    val repoCount: Int
+    val repoCount: Int,
+    val avatarUrl: String?
 )

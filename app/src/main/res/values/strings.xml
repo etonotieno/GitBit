@@ -5,4 +5,5 @@
     <string name="no_repos_found">No repositories were found</string>
     <string name="username_hint">Username</string>
     <string name="user_repositories">%1d Repositories</string>
+    <string name="user_avatar">User Avatar</string>
 </resources>

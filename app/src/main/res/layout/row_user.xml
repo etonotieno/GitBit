@@ -10,24 +10,35 @@
     app:strokeColor="?attr/colorPrimary"
     app:strokeWidth="2dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:padding="@dimen/spacing_large">
+
+        <ImageView
+            android:id="@+id/user_avatar_image_view"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/user_avatar"
+            tools:src="@drawable/ic_account_circle_black_24dp" />
 
         <TextView
             android:id="@+id/username_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/user_avatar_image_view"
+            android:layout_centerHorizontal="true"
             tools:text="etonotieno" />
 
         <TextView
             android:id="@+id/repos_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/username_text_view"
+            android:layout_centerHorizontal="true"
             tools:text="20 Repositories" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

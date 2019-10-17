@@ -9,7 +9,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
@@ -42,12 +41,19 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
         initSearchInputListener()
 
-        viewModel.usernameLiveData.observe(this, Observer {
+        usersAdapter.setOnUserClickListener {
+            dismissKeyboard(username_edit_text.windowToken)
+            viewModel.setUserName(it.username)
+        }
+
+        viewModel.usernameLiveData.observe(this) {
             username_edit_text.setText(it)
-        })
+        }
 
         viewModel.githubUsers.observe(this) { users ->
-            usersAdapter.submitList(users)
+            usersAdapter.submitList(users.reversed()) {
+                saved_users_recycler_view.smoothScrollToPosition(0)
+            }
         }
 
         viewModel.githubRepos.observe(this) { result ->
