@@ -7,12 +7,18 @@ import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.User
 import io.devbits.gitbit.domain.GithubRepository
 
+/**
+ * This ViewModel class is used to fetch data for the HomeActivity screen
+ */
 class HomeViewModel(
     private val repository: GithubRepository,
     private val state: SavedStateHandle
 ) : ViewModel() {
 
-    private val _username = state.getLiveData<String>(USERNAME_KEY)
+    /**
+     * Return a MutableLiveData from the SavedStateHandle that survives process death.
+     */
+    private val _username: MutableLiveData<String> = state.getLiveData<String>(USERNAME_KEY)
     val usernameLiveData: LiveData<String>
         get() = _username
 
@@ -30,14 +36,27 @@ class HomeViewModel(
     }
 
     // TODO: Use a Result wrapper to show LOADING, ERROR and SUCCESS states
+    /**
+     * Return a LiveData of users that were searched by the user.
+     */
     val githubUsers: LiveData<List<User>> = repository.getGithubUsers()
 
+    /**
+     * Return a LiveData of a User that matches the username retrieved from the _username LiveData
+     */
     private val githubUser: LiveData<User> = _username.switchMap { username ->
         liveData {
             emitSource(repository.getGithubUser(username))
         }
     }
 
+    /**
+     * Get Github repositories from the Repository.
+     *
+     * The githubUser LiveData is used to retrieve the username from the saved User.
+     * Fetching the User from Github returns a formatted username that we can use to fetch Github
+     * repositories for that User
+     */
     val repos: LiveData<Result<List<Repo>>> = githubUser.switchMap { user ->
         liveData<Result<List<Repo>>> {
             emit(Result.Loading)
@@ -51,6 +70,9 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Set the username to the SavedStateHandle
+     */
     fun setUserName(username: String) {
         if (_username.value != username) {
             state[USERNAME_KEY] = username

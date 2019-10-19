@@ -26,6 +26,8 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     private val reposAdapter = GithubRepoAdapter()
     private val usersAdapter = GithubUserAdapter()
+
+    // TODO: Use DI to inject these dependencies
     private val database by lazy { GithubRepoDatabase(this) }
     private val repoDao by lazy { database.repoDao() }
     private val userDao by lazy { database.userDao() }
