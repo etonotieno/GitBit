@@ -55,7 +55,7 @@ class HomeViewModel(
      *
      * The githubUser LiveData is used to retrieve the username from the saved User.
      * Fetching the User from Github returns a formatted username that we can use to fetch Github
-     * repositories for that User
+     * repositories for that User. This currently leads to a NullPointerException
      */
     val repos: LiveData<Result<List<Repo>>> = githubUser.switchMap { user ->
         liveData<Result<List<Repo>>> {
