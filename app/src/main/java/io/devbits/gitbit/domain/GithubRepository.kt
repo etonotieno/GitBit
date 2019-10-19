@@ -38,6 +38,13 @@ class GithubRepository(
         return usersDao.getUsers()
     }
 
+    suspend fun getGithubUser(username: String): LiveData<User> {
+        if (usersDao.rows(username) == 0) {
+            fetchAndSaveUser(username)
+        }
+        return usersDao.getUser(username)
+    }
+
 }
 
 fun GithubApiResponse.mapToRepo(): Repo {

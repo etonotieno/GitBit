@@ -16,4 +16,10 @@ interface GithubUserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: User)
 
+    @Query("SELECT * FROM User WHERE username =:username")
+    fun getUser(username: String): LiveData<User>
+
+    @Query("SELECT COUNT(username) FROM User WHERE username =:username")
+    suspend fun rows(username: String): Int
+
 }

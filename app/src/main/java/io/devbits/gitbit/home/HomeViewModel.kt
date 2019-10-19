@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import io.devbits.gitbit.data.Repo
 import io.devbits.gitbit.data.Result
+import io.devbits.gitbit.data.User
 import io.devbits.gitbit.domain.GithubRepository
 
 class HomeViewModel(
@@ -29,7 +30,26 @@ class HomeViewModel(
     }
 
     // TODO: Use a Result wrapper to show LOADING, ERROR and SUCCESS states
-    val githubUsers = repository.getGithubUsers()
+    val githubUsers: LiveData<List<User>> = repository.getGithubUsers()
+
+    private val githubUser: LiveData<User> = _username.switchMap { username ->
+        liveData {
+            emitSource(repository.getGithubUser(username))
+        }
+    }
+
+    val repos: LiveData<Result<List<Repo>>> = githubUser.switchMap { user ->
+        liveData<Result<List<Repo>>> {
+            emit(Result.Loading)
+            try {
+                val reposLiveData = repository.getRepos(user.username)
+                emitSource(reposLiveData.map { Result.Success(it) })
+            } catch (exception: Exception) {
+                Log.e("GithubApi", "Get Github Repos Failed", exception)
+                emit(Result.Error(exception, "The app encountered an unexpected error"))
+            }
+        }
+    }
 
     fun setUserName(username: String) {
         if (_username.value != username) {
