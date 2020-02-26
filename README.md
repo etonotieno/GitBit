@@ -2,9 +2,9 @@
 
 Search for github repositories and save the result offline.
 
-# Demo
+## Demo
 
-<img src="art/recording.gif" width="300" align="right" hspace="20">
+<img src="art/recording.gif" width="300">
 
 ## Reach Out
 
