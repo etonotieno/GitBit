@@ -20,7 +20,7 @@ class GithubUserViewHolder private constructor(
     fun bind(user: User, onUserClick: OnUserClick) {
         itemView.username_text_view.text = user.username
         itemView.repos_text_view.text =
-            context.getString(R.string.user_repositories, user.repoCount)
+            context?.getString(R.string.user_repositories, user.repoCount)
         itemView.user_avatar_image_view.load(user.avatarUrl) {
             placeholder(R.drawable.ic_account_circle_black_24dp)
             error(R.drawable.ic_account_circle_black_24dp)

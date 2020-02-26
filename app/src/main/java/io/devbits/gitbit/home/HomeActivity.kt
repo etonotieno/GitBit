@@ -58,7 +58,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
             }
         }
 
-        viewModel.githubRepos.observe(this) { result ->
+        viewModel.repos.observe(this) { result ->
             when (result) {
                 is Result.Success -> {
                     if (result.data.isNullOrEmpty()) {
