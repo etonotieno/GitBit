@@ -4,7 +4,7 @@ Search for github repositories and save the result offline.
 
 # Demo
 
-![](https://github.com/etonotieno/GitBit/blob/master/art/recording.webm)
+<img src="art/recording.gif" width="300" align="right" hspace="20">
 
 ## Reach Out
 
