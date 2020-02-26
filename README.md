@@ -4,7 +4,7 @@ Search for github repositories and save the result offline.
 
 # Demo
 
-![](https://github.com/etonotieno/GitBit/blob/master/recording.webm)
+![](https://github.com/etonotieno/GitBit/blob/master/art/recording.webm)
 
 ## Reach Out
 
