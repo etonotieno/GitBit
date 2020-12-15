@@ -1,13 +1,21 @@
-## Git Bit
-
+Git Bit
+------------
 Search for github repositories and save the result offline.
 
-## Demo
+📱 Demo
+------------
 
 <img src="art/recording.gif" width="300">
 
-## Reach Out
+🏅 MADscore
+------------
 
-[Twitter](https://twitter.com/etonotieno)
+![MAD Score Summary](art/madscore/summary.png)
+![MAD Score Kotlin](art/madscore/kotlin.png)
+![MAD Score Jetpack](art/madscore/jetpack.png)
 
-[LinkedIn](https://www.linkedin.com/in/etonotieno)
+💬 Reach Out
+------------
+
+* [Twitter](https://twitter.com/etonotieno)
+* [LinkedIn](https://www.linkedin.com/in/etonotieno)
