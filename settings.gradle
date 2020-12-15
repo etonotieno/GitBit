@@ -1,2 +1,2 @@
-include ':app'
-rootProject.name='GitBit'
+rootProject.name = "GitBit"
+include(":app")
