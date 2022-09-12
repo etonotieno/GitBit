@@ -46,7 +46,11 @@ class HomeViewModel(
      */
     private val githubUser: LiveData<User> = _username.switchMap { username ->
         liveData {
-            emitSource(repository.getGithubUser(username))
+            try {
+                emitSource(repository.getGithubUser(username))
+            } catch (e: Exception) {
+                Log.e("GithubApi", "Get Github User Failed", e)
+            }
         }
     }
 

@@ -52,7 +52,7 @@ class GithubRepository(
      */
     private suspend fun fetchAndSaveRepos(username: String) {
         val apiResponse = apiService.getRepositories(username)
-        val repos = apiResponse.map { it.mapToRepo() }
+        val repos = apiResponse.map(GithubApiResponse::mapToRepo)
         repoDao.insertRepos(repos)
     }
 
