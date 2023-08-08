@@ -64,7 +64,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
         viewModel.repos.observe(this) { result ->
             when (result) {
                 is Result.Success -> {
-                    if (result.data.isNullOrEmpty()) {
+                    if (result.data.isEmpty()) {
                         binding.reposRecyclerView.hide()
                         binding.progressBar.hide()
                         binding.emptyStateTextView.show()

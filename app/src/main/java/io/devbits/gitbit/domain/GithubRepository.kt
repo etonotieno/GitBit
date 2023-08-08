@@ -23,7 +23,7 @@ class GithubRepository(
      * Since RepoDao returns LiveData, once the insert is made, the LiveData is updated.
      */
     suspend fun getRepos(username: String): LiveData<List<Repo>> {
-        if (repoDao.rows(username) == 0) {
+        if (!repoDao.hasRepos(username)) {
             fetchAndSaveRepos(username)
         }
         return repoDao.getGithubRepos(username)
@@ -52,8 +52,10 @@ class GithubRepository(
      */
     private suspend fun fetchAndSaveRepos(username: String) {
         val apiResponse = apiService.getRepositories(username)
-        val repos = apiResponse.map(GithubApiResponse::mapToRepo)
-        repoDao.insertRepos(repos)
+        if (apiResponse != null) {
+            val repos = apiResponse.map(GithubApiResponse::mapToRepo)
+            repoDao.insertRepos(repos)
+        }
     }
 
     /**
@@ -62,8 +64,10 @@ class GithubRepository(
      */
     private suspend fun fetchAndSaveUser(username: String) {
         val apiResponse = apiService.getGithubUser(username)
-        val user = User(apiResponse.login, apiResponse.publicRepos, apiResponse.avatarUrl)
-        usersDao.insertUser(user)
+        if (apiResponse != null) {
+            val user = User(apiResponse.login, apiResponse.publicRepos, apiResponse.avatarUrl)
+            usersDao.insertUser(user)
+        }
     }
 
 }
@@ -73,10 +77,10 @@ class GithubRepository(
  */
 fun GithubApiResponse.mapToRepo(): Repo {
     return Repo(
-        name,
-        id,
-        stars,
-        description ?: "",
-        owner.username
+        id = id,
+        name = name,
+        stars = stars,
+        description = description.orEmpty(),
+        ownerUsername = owner.username
     )
 }

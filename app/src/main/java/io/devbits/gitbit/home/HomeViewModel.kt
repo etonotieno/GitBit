@@ -18,12 +18,12 @@ class HomeViewModel(
     /**
      * Return a MutableLiveData from the SavedStateHandle that survives process death.
      */
-    private val _username: MutableLiveData<String> = state.getLiveData<String>(USERNAME_KEY)
+    private val _username: MutableLiveData<String> = state.getLiveData(USERNAME_KEY)
     val usernameLiveData: LiveData<String>
         get() = _username
 
     val githubRepos: LiveData<Result<List<Repo>>> = _username.switchMap { username ->
-        liveData<Result<List<Repo>>> {
+        liveData {
             emit(Result.Loading)
             try {
                 val reposLiveData = repository.getRepos(username)
@@ -62,7 +62,7 @@ class HomeViewModel(
      * repositories for that User. This currently leads to a NullPointerException
      */
     val repos: LiveData<Result<List<Repo>>> = githubUser.switchMap { user ->
-        liveData<Result<List<Repo>>> {
+        liveData {
             emit(Result.Loading)
             try {
                 val reposLiveData = repository.getRepos(user.username)

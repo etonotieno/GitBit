@@ -8,11 +8,11 @@ interface GithubApiService {
     @GET("/users/{login}/repos")
     suspend fun getRepositories(
         @Path("login") username: String
-    ): List<GithubApiResponse>
+    ): List<GithubApiResponse>?
 
     @GET("users/{login}")
     suspend fun getGithubUser(
         @Path("login") username: String
-    ): GithubUser
+    ): GithubUser?
 
 }

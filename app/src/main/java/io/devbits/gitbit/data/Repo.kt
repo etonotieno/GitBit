@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Repo(
-    val name: String,
     @PrimaryKey
     val id: Int,
+    val name: String,
     val stars: Int,
     val description: String,
     val ownerUsername: String
