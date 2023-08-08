@@ -1,28 +1,26 @@
 package io.devbits.gitbit.home.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.devbits.gitbit.R
 import io.devbits.gitbit.data.Repo
-import kotlinx.android.synthetic.main.row_repo_layout.view.*
+import io.devbits.gitbit.databinding.RowRepoLayoutBinding
 
 class GithubRepoViewHolder private constructor(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+    private val binding: RowRepoLayoutBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(repo: Repo) {
-        itemView.repository_name_text_view.text = repo.name
-        itemView.description_text_view.text = repo.description
-        itemView.star_count_text_view.text = repo.stars.toString()
+        binding.repositoryNameTextView.text = repo.name
+        binding.descriptionTextView.text = repo.description
+        binding.starCountTextView.text = repo.stars.toString()
     }
 
     companion object {
         fun create(parent: ViewGroup): GithubRepoViewHolder {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.row_repo_layout, parent, false)
-            return GithubRepoViewHolder(view)
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = RowRepoLayoutBinding.inflate(inflater, parent, false)
+            return GithubRepoViewHolder(binding)
         }
     }
 }
