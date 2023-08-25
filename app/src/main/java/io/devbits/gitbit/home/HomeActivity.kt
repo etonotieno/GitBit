@@ -30,7 +30,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
     private val database by lazy { GithubRepoDatabase(this) }
     private val repoDao by lazy { database.repoDao() }
     private val userDao by lazy { database.userDao() }
-    private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient() }
+    private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient(this) }
     private val repository by lazy { GithubRepository(apiService, repoDao, userDao) }
     private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository, this) }
 

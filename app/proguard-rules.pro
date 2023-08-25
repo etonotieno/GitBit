@@ -14,8 +14,24 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
+
+#ParametrizedType ClassCastException error fix
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.** { *; }
+
+-keep,allowobfuscation,allowshrinking class io.devbits.gitbit.data.** { *; }
+
+-keep,allowobfuscation,allowshrinking class io.devbits.gitbit.data.Result
+-keep,allowobfuscation,allowshrinking class io.devbits.gitbit.data.remote.model.GithubApiResponse
+
+# R8 full mode strips generic signatures from return types if not kept.
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+
+-keep,allowobfuscation,allowshrinking interface io.devbits.gitbit.data.remote.** { *; }

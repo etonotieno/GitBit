@@ -5,7 +5,7 @@ import io.devbits.gitbit.data.Repo
 import io.devbits.gitbit.data.User
 import io.devbits.gitbit.data.local.GithubUserDao
 import io.devbits.gitbit.data.local.RepoDao
-import io.devbits.gitbit.data.remote.GithubApiResponse
+import io.devbits.gitbit.data.remote.model.GithubApiResponse
 import io.devbits.gitbit.data.remote.GithubApiService
 
 /**
@@ -15,7 +15,7 @@ import io.devbits.gitbit.data.remote.GithubApiService
 class GithubRepository(
     private val apiService: GithubApiService,
     private val repoDao: RepoDao,
-    private val usersDao: GithubUserDao
+    private val usersDao: GithubUserDao,
 ) {
 
     /**
@@ -64,9 +64,12 @@ class GithubRepository(
      */
     private suspend fun fetchAndSaveUser(username: String) {
         val apiResponse = apiService.getGithubUser(username)
-        if (apiResponse != null) {
-            val user = User(apiResponse.login, apiResponse.publicRepos, apiResponse.avatarUrl)
-            usersDao.insertUser(user)
+        if (apiResponse.isSuccessful) {
+            val body = apiResponse.body()
+            if (body != null) {
+                val user = User(body.login, body.publicRepos, body.avatarUrl)
+                usersDao.insertUser(user)
+            }
         }
     }
 
