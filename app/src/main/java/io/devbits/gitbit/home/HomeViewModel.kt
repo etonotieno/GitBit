@@ -1,18 +1,27 @@
 package io.devbits.gitbit.home
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import io.devbits.gitbit.data.Repo
 import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.User
-import io.devbits.gitbit.domain.GithubRepository
+import io.devbits.gitbit.data.repository.RepoRepository
+import io.devbits.gitbit.data.repository.UserRepository
 
 /**
  * This ViewModel class is used to fetch data for the HomeActivity screen
  */
 class HomeViewModel(
-    private val repository: GithubRepository,
-    private val state: SavedStateHandle
+    private val userRepository: UserRepository,
+    private val repoRepository: RepoRepository,
+    private val state: SavedStateHandle,
 ) : ViewModel() {
 
     /**
@@ -26,7 +35,7 @@ class HomeViewModel(
         liveData {
             emit(Result.Loading)
             try {
-                val reposLiveData = repository.getRepos(username)
+                val reposLiveData = repoRepository.getRepos(username).asLiveData()
                 emitSource(reposLiveData.map { Result.Success(it) })
             } catch (exception: Exception) {
                 Log.e("GithubApi", "Get Github Repos Failed", exception)
@@ -39,7 +48,7 @@ class HomeViewModel(
     /**
      * Return a LiveData of users that were searched by the user.
      */
-    val githubUsers: LiveData<List<User>> = repository.getGithubUsers()
+    val githubUsers: LiveData<List<User>> = userRepository.getUsers().asLiveData()
 
     /**
      * Return a LiveData of a User that matches the username retrieved from the _username LiveData
@@ -47,7 +56,7 @@ class HomeViewModel(
     private val githubUser: LiveData<User> = _username.switchMap { username ->
         liveData {
             try {
-                emitSource(repository.getGithubUser(username))
+                emitSource(userRepository.getUser(username).asLiveData())
             } catch (e: Exception) {
                 Log.e("GithubApi", "Get Github User Failed", e)
             }
@@ -65,7 +74,7 @@ class HomeViewModel(
         liveData {
             emit(Result.Loading)
             try {
-                val reposLiveData = repository.getRepos(user.username)
+                val reposLiveData = repoRepository.getRepos(user.username).asLiveData()
                 emitSource(reposLiveData.map { Result.Success(it) })
             } catch (exception: Exception) {
                 Log.e("GithubApi", "Get Github Repos Failed", exception)

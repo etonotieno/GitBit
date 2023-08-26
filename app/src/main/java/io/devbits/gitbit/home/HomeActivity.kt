@@ -14,8 +14,9 @@ import io.devbits.gitbit.R
 import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.local.GithubRepoDatabase
 import io.devbits.gitbit.data.remote.GithubApiServiceCreator
+import io.devbits.gitbit.data.repository.DefaultRepoRepository
+import io.devbits.gitbit.data.repository.DefaultUserRepository
 import io.devbits.gitbit.databinding.ActivityHomeBinding
-import io.devbits.gitbit.domain.GithubRepository
 import io.devbits.gitbit.home.adapter.GithubRepoAdapter
 import io.devbits.gitbit.home.adapter.GithubUserAdapter
 import io.devbits.gitbit.util.hide
@@ -31,8 +32,19 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
     private val repoDao by lazy { database.repoDao() }
     private val userDao by lazy { database.userDao() }
     private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient(this) }
-    private val repository by lazy { GithubRepository(apiService, repoDao, userDao) }
-    private val viewModel: HomeViewModel by viewModels { GitBitViewModelFactory(repository, this) }
+    private val repoRepoRepository by lazy {
+        DefaultRepoRepository(apiService = apiService, repoDao = repoDao)
+    }
+    private val userRepository by lazy {
+        DefaultUserRepository(apiService = apiService, usersDao = userDao)
+    }
+    private val viewModel: HomeViewModel by viewModels {
+        GitBitViewModelFactory(
+            userRepository = userRepository,
+            repoRepository = repoRepoRepository,
+            owner = this,
+        )
+    }
 
     private lateinit var binding: ActivityHomeBinding
 
