@@ -1,19 +1,22 @@
 package io.devbits.gitbit.home
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import io.devbits.gitbit.data.Repo
 import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.User
+import io.devbits.gitbit.data.asResult
 import io.devbits.gitbit.data.repository.RepoRepository
 import io.devbits.gitbit.data.repository.UserRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * This ViewModel class is used to fetch data for the HomeActivity screen
@@ -25,70 +28,88 @@ class HomeViewModel(
 ) : ViewModel() {
 
     /**
-     * Return a MutableLiveData from the SavedStateHandle that survives process death.
+     * Return a MutableFlow from the SavedStateHandle that survives process death.
      */
-    private val _username: MutableLiveData<String> = state.getLiveData(USERNAME_KEY)
-    val usernameLiveData: LiveData<String>
-        get() = _username
-
-    val githubRepos: LiveData<Result<List<Repo>>> = _username.switchMap { username ->
-        liveData {
-            emit(Result.Loading)
-            try {
-                val reposLiveData = repoRepository.getRepos(username).asLiveData()
-                emitSource(reposLiveData.map { Result.Success(it) })
-            } catch (exception: Exception) {
-                Log.e("GithubApi", "Get Github Repos Failed", exception)
-                emit(Result.Error(exception, "The app encountered an unexpected error"))
-            }
-        }
-    }
-
-    // TODO: Use a Result wrapper to show LOADING, ERROR and SUCCESS states
-    /**
-     * Return a LiveData of users that were searched by the user.
-     */
-    val githubUsers: LiveData<List<User>> = userRepository.getUsers().asLiveData()
+    val username: StateFlow<String> = state.getStateFlow(USERNAME_KEY, "")
 
     /**
-     * Return a LiveData of a User that matches the username retrieved from the _username LiveData
+     * Return a Flow of a User that matches the username retrieved from the username Flow
      */
-    private val githubUser: LiveData<User> = _username.switchMap { username ->
-        liveData {
-            try {
-                emitSource(userRepository.getUser(username).asLiveData())
-            } catch (e: Exception) {
-                Log.e("GithubApi", "Get Github User Failed", e)
-            }
-        }
-    }
-
     /**
      * Get Github repositories from the Repository.
      *
-     * The githubUser LiveData is used to retrieve the username from the saved User.
+     * The githubUser Flow is used to retrieve the username from the saved User.
      * Fetching the User from Github returns a formatted username that we can use to fetch Github
      * repositories for that User. This currently leads to a NullPointerException
      */
-    val repos: LiveData<Result<List<Repo>>> = githubUser.switchMap { user ->
-        liveData {
-            emit(Result.Loading)
-            try {
-                val reposLiveData = repoRepository.getRepos(user.username).asLiveData()
-                emitSource(reposLiveData.map { Result.Success(it) })
-            } catch (exception: Exception) {
-                Log.e("GithubApi", "Get Github Repos Failed", exception)
-                emit(Result.Error(exception, "The app encountered an unexpected error"))
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val reposUiState: StateFlow<RepoUiState> = username
+        .filter { it.isNotBlank() }
+        .flatMapLatest(repoRepository::getRepos)
+        .asResult()
+        .map {
+            when (it) {
+                is Result.Error -> RepoUiState.Error
+                Result.Loading -> RepoUiState.Loading
+                is Result.Success -> {
+                    if (it.data.isEmpty()) RepoUiState.Empty else RepoUiState.Success(it.data)
+                }
             }
         }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = RepoUiState.Initial,
+        )
+
+    /**
+     * Return a Flow of users that were searched by the user.
+     */
+    val usersUiState: StateFlow<UserUiState> = userRepository.getUsers()
+        .map(List<User>::reversed)
+        .asResult()
+        .map {
+            when (it) {
+                is Result.Error -> UserUiState.Error
+                Result.Loading -> UserUiState.Loading
+                is Result.Success -> {
+                    if (it.data.isEmpty()) UserUiState.Empty else UserUiState.Success(it.data)
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UserUiState.Initial,
+        )
 
     /**
      * Set the username to the SavedStateHandle
      */
-    fun setUserName(username: String) {
-        if (_username.value != username) {
+    private fun setUserName(username: String) {
+        if (this.username.value != username) {
             state[USERNAME_KEY] = username
+        }
+    }
+
+    private fun fetchAndSaveUserData(username: String) {
+        if (username.isBlank()) return
+        viewModelScope.launch {
+            userRepository.fetchAndSaveUser(username)
+            repoRepository.fetchAndSaveRepos(username)
+        }
+    }
+
+    fun onEvent(events: HomeUiEvents) {
+        when (events) {
+            is HomeUiEvents.SetUserName -> {
+                setUserName(events.username)
+                fetchAndSaveUserData(events.username)
+            }
+
+            is HomeUiEvents.UserClick -> {
+                setUserName(events.username)
+            }
         }
     }
 
@@ -96,4 +117,31 @@ class HomeViewModel(
         const val USERNAME_KEY = "io.devbits:GITHUB_USERNAME"
     }
 
+}
+
+sealed interface RepoUiState {
+    data object Initial : RepoUiState
+    data object Loading : RepoUiState
+    data object Empty : RepoUiState
+
+    data class Success(val repos: List<Repo>) : RepoUiState
+
+    data object Error : RepoUiState
+}
+
+sealed interface UserUiState {
+    data object Initial : UserUiState
+    data object Loading : UserUiState
+    data object Empty : UserUiState
+
+    data class Success(val users: List<User>) : UserUiState
+
+    data object Error : UserUiState
+}
+
+sealed interface HomeUiState {
+    data object Loading : HomeUiState
+    data class Success(val users: List<User>, val repos: List<Repo>) : HomeUiState
+
+    data class Error(val message: String? = null, val throwable: Throwable? = null) : HomeUiState
 }

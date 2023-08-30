@@ -9,9 +9,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
-import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.local.GithubRepoDatabase
 import io.devbits.gitbit.data.remote.GithubApiServiceCreator
 import io.devbits.gitbit.data.repository.DefaultRepoRepository
@@ -21,6 +23,8 @@ import io.devbits.gitbit.home.adapter.GithubRepoAdapter
 import io.devbits.gitbit.home.adapter.GithubUserAdapter
 import io.devbits.gitbit.util.hide
 import io.devbits.gitbit.util.show
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
@@ -60,50 +64,81 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
         usersAdapter.setOnUserClickListener {
             dismissKeyboard(binding.usernameEditText.windowToken)
-            viewModel.setUserName(it.username)
+            viewModel.onEvent(HomeUiEvents.UserClick(it.username))
         }
 
-        viewModel.usernameLiveData.observe(this) {
-            binding.usernameEditText.setText(it)
-        }
+        lifecycleScope.launch {
+            viewModel.usersUiState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
+                    when (it) {
+                        UserUiState.Empty -> {}
 
-        viewModel.githubUsers.observe(this) { users ->
-            usersAdapter.submitList(users.reversed()) {
-                binding.savedUsersRecyclerView.smoothScrollToPosition(0)
-            }
-        }
+                        UserUiState.Error -> {}
 
-        viewModel.repos.observe(this) { result ->
-            when (result) {
-                is Result.Success -> {
-                    if (result.data.isEmpty()) {
-                        binding.reposRecyclerView.hide()
-                        binding.progressBar.hide()
-                        binding.emptyStateTextView.show()
-                        binding.emptyStateTextView.text = getString(R.string.no_repos_found)
-                        return@observe
+                        UserUiState.Initial -> {}
+
+                        UserUiState.Loading -> {}
+
+                        is UserUiState.Success -> {
+                            usersAdapter.submitList(it.users) {
+                                binding.savedUsersRecyclerView.smoothScrollToPosition(0)
+                            }
+                        }
                     }
-                    binding.reposRecyclerView.show()
-                    binding.progressBar.hide()
-                    binding.emptyStateTextView.hide()
-                    reposAdapter.submitList(result.data)
                 }
-
-                is Result.Error -> {
-                    binding.reposRecyclerView.hide()
-                    binding.progressBar.hide()
-                    binding.emptyStateTextView.show()
-                    binding.emptyStateTextView.text = getString(R.string.error_fetching_repos)
-                }
-
-                Result.Loading -> {
-                    binding.reposRecyclerView.hide()
-                    binding.progressBar.show()
-                    binding.emptyStateTextView.hide()
-                }
-            }
         }
 
+        lifecycleScope.launch {
+            viewModel.username
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest { binding.usernameEditText.setText(it) }
+        }
+
+        lifecycleScope.launch {
+            viewModel.reposUiState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest { result ->
+                    when (result) {
+                        RepoUiState.Error -> {
+                            binding.reposRecyclerView.hide()
+                            binding.progressBar.hide()
+                            binding.emptyStateTextView.show()
+                            binding.emptyStateTextView.text =
+                                getString(R.string.error_fetching_repos)
+                        }
+
+                        RepoUiState.Initial -> {
+                            binding.reposRecyclerView.hide()
+                            binding.progressBar.hide()
+                            binding.emptyStateTextView.show()
+                            binding.emptyStateTextView.text =
+                                getString(R.string.fill_username)
+                        }
+
+                        RepoUiState.Loading -> {
+                            binding.reposRecyclerView.hide()
+                            binding.progressBar.show()
+                            binding.emptyStateTextView.hide()
+                        }
+
+                        is RepoUiState.Success -> {
+                            binding.reposRecyclerView.show()
+                            binding.progressBar.hide()
+                            binding.emptyStateTextView.hide()
+                            reposAdapter.submitList(result.repos)
+                        }
+
+                        RepoUiState.Empty -> {
+                            binding.reposRecyclerView.hide()
+                            binding.progressBar.hide()
+                            binding.emptyStateTextView.show()
+                            binding.emptyStateTextView.text =
+                                getString(R.string.no_repos_found)
+                        }
+                    }
+                }
+        }
     }
 
     private fun initSearchInputListener() {
@@ -129,7 +164,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
         val username = binding.usernameEditText.text.toString()
         // Dismiss keyboard
         dismissKeyboard(v.windowToken)
-        viewModel.setUserName(username)
+        viewModel.onEvent(HomeUiEvents.SetUserName(username))
     }
 
     private fun dismissKeyboard(windowToken: IBinder) {

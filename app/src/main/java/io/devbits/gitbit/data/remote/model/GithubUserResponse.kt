@@ -1,4 +1,4 @@
-package io.devbits.gitbit.data.remote
+package io.devbits.gitbit.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 

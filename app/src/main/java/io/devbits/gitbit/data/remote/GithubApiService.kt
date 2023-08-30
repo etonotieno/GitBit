@@ -1,6 +1,7 @@
 package io.devbits.gitbit.data.remote
 
 import io.devbits.gitbit.data.remote.model.GithubApiResponse
+import io.devbits.gitbit.data.remote.model.GithubUser
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

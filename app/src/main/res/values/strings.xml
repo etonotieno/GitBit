@@ -3,6 +3,7 @@
     <string name="error_fetching_repos">Error fetching repositories. Check your username</string>
     <string name="unexpected_error">An unexpected error was encountered</string>
     <string name="no_repos_found">No repositories were found</string>
+    <string name="fill_username">Fill in the Username</string>
     <string name="username_hint">Username</string>
     <string name="user_repositories">%1d Repositories</string>
     <string name="user_avatar">User Avatar</string>
