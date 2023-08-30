@@ -1,5 +1,6 @@
 package io.devbits.gitbit.home
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import io.devbits.gitbit.MainDispatcherRule
 import io.devbits.gitbit.data.repository.TestRepoRepository
@@ -11,6 +12,9 @@ class HomeViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     private val userRepository = TestUserRepository()
     private val repoRepository = TestRepoRepository()
