@@ -2,7 +2,13 @@ package io.devbits.gitbit.home
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import io.devbits.gitbit.GitBitApp
 import io.devbits.gitbit.data.Repo
 import io.devbits.gitbit.data.Result
 import io.devbits.gitbit.data.User
@@ -115,6 +121,19 @@ class HomeViewModel(
 
     companion object {
         const val USERNAME_KEY = "io.devbits:GITHUB_USERNAME"
+
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val app = this[APPLICATION_KEY] as GitBitApp
+                val savedStateHandle = createSavedStateHandle()
+
+                HomeViewModel(
+                    userRepository = app.userRepository,
+                    repoRepository = app.repoRepoRepository,
+                    state = savedStateHandle,
+                )
+            }
+        }
     }
 
 }

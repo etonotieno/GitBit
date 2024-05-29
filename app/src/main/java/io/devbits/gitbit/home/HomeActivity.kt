@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
@@ -12,12 +13,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import io.devbits.gitbit.GitBitViewModelFactory
 import io.devbits.gitbit.R
-import io.devbits.gitbit.data.local.GithubRepoDatabase
-import io.devbits.gitbit.data.remote.GithubApiServiceCreator
-import io.devbits.gitbit.data.repository.DefaultRepoRepository
-import io.devbits.gitbit.data.repository.DefaultUserRepository
 import io.devbits.gitbit.databinding.ActivityHomeBinding
 import io.devbits.gitbit.home.adapter.GithubRepoAdapter
 import io.devbits.gitbit.home.adapter.GithubUserAdapter
@@ -31,24 +27,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
     private val reposAdapter = GithubRepoAdapter()
     private val usersAdapter = GithubUserAdapter()
 
-    // TODO: Use DI to inject these dependencies
-    private val database by lazy { GithubRepoDatabase(this) }
-    private val repoDao by lazy { database.repoDao() }
-    private val userDao by lazy { database.userDao() }
-    private val apiService by lazy { GithubApiServiceCreator.getRetrofitClient(this) }
-    private val repoRepoRepository by lazy {
-        DefaultRepoRepository(apiService = apiService, repoDao = repoDao)
-    }
-    private val userRepository by lazy {
-        DefaultUserRepository(apiService = apiService, usersDao = userDao)
-    }
-    private val viewModel: HomeViewModel by viewModels {
-        GitBitViewModelFactory(
-            userRepository = userRepository,
-            repoRepository = repoRepoRepository,
-            owner = this,
-        )
-    }
+    private val viewModel: HomeViewModel by viewModels { HomeViewModel.Factory }
 
     private lateinit var binding: ActivityHomeBinding
 
@@ -56,6 +35,8 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
         binding.reposRecyclerView.adapter = reposAdapter
         binding.savedUsersRecyclerView.adapter = usersAdapter
